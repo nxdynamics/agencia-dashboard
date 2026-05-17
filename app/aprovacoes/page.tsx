@@ -318,14 +318,6 @@ loadVideos();
 >
   Eliminar vídeo
 </button>
-{userRole === "admin" && (
-  <button
-    onClick={() => deleteVideo(video.id)}
-    className="mt-3 rounded-2xl bg-red-600 px-4 py-2 font-semibold text-white transition hover:bg-red-700"
-  >
-    Eliminar vídeo
-  </button>
-)}
 {editingVideoId === video.id && (
   <div className="mt-4 space-y-3 rounded-2xl border border-slate-200 bg-slate-50 p-4">
     <input
