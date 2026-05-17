@@ -150,7 +150,7 @@ async function saveNotes(videoId: string) {
               await supabase.auth.signOut();
               router.push("/login");
             }}
-            className="rounded-2xl border border-slate-200 px-5 py-3 text-sm font-medium text-slate-200 transition hover:bg-slate-100"
+            className="rounded-2xl bg-slate-950 px-5 py-3 font-semibold text-white transition hover:bg-slate-800"
           >
             Logout
           </button>
@@ -181,6 +181,12 @@ async function saveNotes(videoId: string) {
           >
             Calendário
           </a>
+          <a
+  href="/conta"
+  className="rounded-2xl border border-slate-200 px-5 py-3 text-sm font-bold text-slate-950 transition hover:bg-slate-100"
+>
+  Conta
+</a>
         </div>
       </div>
 

@@ -219,7 +219,7 @@ loadVideos();
         await supabase.auth.signOut();
         router.push("/login");
       }}
-      className="rounded-2xl border border-slate-200 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-slate-100"
+      className="rounded-2xl bg-slate-950 px-5 py-3 font-semibold text-white transition hover:bg-slate-800"
     >
       Logout
     </button>
@@ -246,6 +246,12 @@ loadVideos();
     >
       Calendário
     </a>
+    <a
+  href="/conta"
+  className="rounded-2xl border border-slate-200 px-5 py-3 text-sm font-bold text-slate-950 transition hover:bg-slate-100"
+>
+  Conta
+</a>
   </div>
 </div>
         <p className="mt-2 text-gray-600">
