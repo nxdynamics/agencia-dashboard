@@ -207,15 +207,27 @@ const [editingClientEmail, setEditingClientEmail] = useState("");
     if (value === "alteracoes") return "Pediu alterações";
     return "Pendente";
   }
-async function deleteVideo(videoId: string) {
-  const confirmDelete = confirm("Tens a certeza que queres eliminar este vídeo?");
+async function deleteVideo(video: Video) {
+  const confirmDelete = confirm(
+    "Tens a certeza que queres eliminar este vídeo?"
+  );
 
   if (!confirmDelete) return;
+
+  if (video.video_url) {
+    const fileName = video.video_url.split("/").pop();
+
+    if (fileName) {
+      await supabase.storage
+        .from("videos")
+        .remove([fileName]);
+    }
+  }
 
   const { error } = await supabase
     .from("videos")
     .delete()
-    .eq("id", videoId);
+    .eq("id", video.id);
 
   if (error) {
     alert(error.message);

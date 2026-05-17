@@ -184,15 +184,27 @@ async function updateStatus(videoId: string, status: string) {
 
   loadVideos();
 }
-async function deleteVideo(videoId: string) {
-  const confirmDelete = confirm("Tens a certeza que queres eliminar este vídeo?");
+async function deleteVideo(video: Video) {
+  const confirmDelete = confirm(
+    "Tens a certeza que queres eliminar este vídeo?"
+  );
 
   if (!confirmDelete) return;
+
+  if (video.video_url) {
+    const fileName = video.video_url.split("/").pop();
+
+    if (fileName) {
+      await supabase.storage
+        .from("videos")
+        .remove([fileName]);
+    }
+  }
 
   const { error } = await supabase
     .from("videos")
     .delete()
-    .eq("id", videoId);
+    .eq("id", video.id);
 
   if (error) {
     alert(error.message);
@@ -300,6 +312,12 @@ loadVideos();
     Editar vídeo
   </button>
 )}
+<button
+  onClick={() => deleteVideo(video)}
+  className="mt-3 rounded-2xl bg-red-600 px-4 py-2 font-semibold text-white transition hover:bg-red-700"
+>
+  Eliminar vídeo
+</button>
 {userRole === "admin" && (
   <button
     onClick={() => deleteVideo(video.id)}
