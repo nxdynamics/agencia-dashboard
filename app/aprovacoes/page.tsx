@@ -184,6 +184,23 @@ async function updateStatus(videoId: string, status: string) {
 
   loadVideos();
 }
+async function deleteVideo(videoId: string) {
+  const confirmDelete = confirm("Tens a certeza que queres eliminar este vídeo?");
+
+  if (!confirmDelete) return;
+
+  const { error } = await supabase
+    .from("videos")
+    .delete()
+    .eq("id", videoId);
+
+  if (error) {
+    alert(error.message);
+    return;
+  }
+
+  loadVideos();
+}
 useEffect(() => {
   loadClients();
 loadVideos();
@@ -281,6 +298,14 @@ loadVideos();
     className="mt-3 rounded-2xl border border-slate-200 px-4 py-2 font-semibold"
   >
     Editar vídeo
+  </button>
+)}
+{userRole === "admin" && (
+  <button
+    onClick={() => deleteVideo(video.id)}
+    className="mt-3 rounded-2xl bg-red-600 px-4 py-2 font-semibold text-white transition hover:bg-red-700"
+  >
+    Eliminar vídeo
   </button>
 )}
 {editingVideoId === video.id && (
