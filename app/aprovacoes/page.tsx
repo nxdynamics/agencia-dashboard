@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
 type Video = {
+    status: string;
     scheduled_date: string | null;
   id: string;
   title: string;
@@ -167,6 +168,19 @@ async function updateVideo() {
   setEditingVideoDate("");
   setEditingVideoClient("");
   setEditingVideoFile(null);
+
+  loadVideos();
+}
+async function updateStatus(videoId: string, status: string) {
+  const { error } = await supabase
+    .from("videos")
+    .update({ status })
+    .eq("id", videoId);
+
+  if (error) {
+    alert(error.message);
+    return;
+  }
 
   loadVideos();
 }
@@ -357,6 +371,16 @@ loadVideos();
                   <p className="mt-1 text-sm text-gray-600">
                     Estado: {video.video_approval}
                   </p>
+                  {userRole === "admin" && (
+  <select
+    className="mt-3 rounded-2xl border border-slate-200 bg-white p-3 text-slate-950"
+    value={video.status}
+    onChange={(e) => updateStatus(video.id, e.target.value)}
+  >
+    <option value="nao_feito">Não feito</option>
+    <option value="feito">Feito</option>
+  </select>
+)}
 
                   <div className="mt-4 flex gap-3">
                     <button
