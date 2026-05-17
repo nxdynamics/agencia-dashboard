@@ -29,6 +29,7 @@ caption_note: string | null;
 };
 
 export default function Home() {
+  const [clientPassword, setClientPassword] = useState("");
   const [editingVideoId, setEditingVideoId] = useState<string | null>(null);
 
 const [editingVideoTitle, setEditingVideoTitle] = useState("");
@@ -89,23 +90,56 @@ const [editingClientEmail, setEditingClientEmail] = useState("");
 }
 
   async function addClient(e: React.FormEvent) {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (!clientName.trim()) return;
+  if (!clientName.trim() || !clientEmail || !clientPassword) {
+    return;
+  }
 
-    const { error } = await supabase.from("clients").insert({
+  const { data: clientData, error: clientError } = await supabase
+    .from("clients")
+    .insert({
       name: clientName,
-      email: clientEmail || null,
+      email: clientEmail,
+    })
+    .select()
+    .single();
+
+  if (clientError || !clientData) {
+    alert(clientError?.message);
+    return;
+  }
+
+  const { data: authData, error: authError } =
+    await supabase.auth.signUp({
+      email: clientEmail,
+      password: clientPassword,
     });
 
-    if (!error) {
-      setClientName("");
-      setClientEmail("");
-      loadClients();
-    } else {
-      alert(error.message);
-    }
+  if (authError || !authData.user) {
+    alert(authError?.message);
+    return;
   }
+
+  const { error: profileError } = await supabase
+    .from("profiles")
+    .insert({
+      id: authData.user.id,
+      role: "client",
+      client_id: clientData.id,
+    });
+
+  if (profileError) {
+    alert(profileError.message);
+    return;
+  }
+
+  setClientName("");
+  setClientEmail("");
+  setClientPassword("");
+
+  loadClients();
+}
 
   async function addVideo(e: React.FormEvent) {
   e.preventDefault();
@@ -370,6 +404,13 @@ return (
                 value={clientName}
                 onChange={(e) => setClientName(e.target.value)}
               />
+              <input
+  type="password"
+  className="rounded-2xl border border-slate-200 bg-slate-50 p-4 outline-none transition focus:border-slate-900"
+  placeholder="Password inicial"
+  value={clientPassword}
+  onChange={(e) => setClientPassword(e.target.value)}
+/>
 
               <input
                 className="rounded-2xl border border-slate-200 bg-slate-50 p-4 outline-none transition focus:border-slate-900"
