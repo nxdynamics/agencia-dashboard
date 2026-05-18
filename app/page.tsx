@@ -29,6 +29,7 @@ caption_note: string | null;
 };
 
 export default function Home() {
+  const [successMessage, setSuccessMessage] = useState("");
   const [clientPassword, setClientPassword] = useState("");
   const [editingVideoId, setEditingVideoId] = useState<string | null>(null);
 
@@ -46,6 +47,7 @@ const [editingClientEmail, setEditingClientEmail] = useState("");
   const [profileClientId, setProfileClientId] = useState<string | null>(null);
   const [clients, setClients] = useState<Client[]>([]);
   const [videos, setVideos] = useState<Video[]>([]);
+  
 
   const [clientName, setClientName] = useState("");
   const [clientEmail, setClientEmail] = useState("");
@@ -139,6 +141,7 @@ const [editingClientEmail, setEditingClientEmail] = useState("");
   setClientPassword("");
 
   loadClients();
+  setSuccessMessage("Cliente criado com sucesso.");
 }
 
   async function addVideo(e: React.FormEvent) {
@@ -187,7 +190,9 @@ const [editingClientEmail, setEditingClientEmail] = useState("");
     setSelectedClient("");
     setVideoFile(null);
 
+    
     loadVideos();
+    setSuccessMessage("Vídeo adicionado com sucesso.");
   } else {
     alert(error.message);
   }
@@ -306,6 +311,7 @@ async function updateClient() {
   setEditingClientName("");
   setEditingClientEmail("");
   loadClients();
+  setSuccessMessage("Cliente atualizado com sucesso.");
 }
 async function updateVideo() {
   if (!editingVideoId) return;
@@ -364,7 +370,11 @@ return (
             Logout
           </button>
         </div>
-
+{successMessage && (
+  <div className="mt-6 rounded-2xl bg-sky-400 px-5 py-4 font-semibold text-slate-950">
+    {successMessage}
+  </div>
+)}
         <div className="mt-8 flex flex-wrap gap-3">
           <a
             href="/"

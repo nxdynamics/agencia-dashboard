@@ -37,6 +37,7 @@ const [editingVideoDate, setEditingVideoDate] = useState("");
 const [userEmail, setUserEmail] = useState("");
 const [userRole, setUserRole] = useState("");
   const [videos, setVideos] = useState<Video[]>([]);
+  const [successMessage, setSuccessMessage] = useState("");
   const [comments, setComments] = useState<Record<string, string>>({});
 
   async function loadClients() {
@@ -97,6 +98,7 @@ async function updateApproval(
     .eq("id", videoId);
 
   loadVideos();
+  setSuccessMessage("Atualizado com sucesso.");
 }
 
 async function saveComment(videoId: string) {
@@ -108,6 +110,7 @@ async function saveComment(videoId: string) {
     .eq("id", videoId);
 
   loadVideos();
+  setSuccessMessage("Atualizado com sucesso.");
 }
 async function updateVideo() {
   if (!editingVideoId) return;
@@ -170,6 +173,7 @@ async function updateVideo() {
   setEditingVideoFile(null);
 
   loadVideos();
+  setSuccessMessage("Vídeo atualizado com sucesso.");
 }
 async function updateStatus(videoId: string, status: string) {
   const { error } = await supabase
@@ -183,6 +187,7 @@ async function updateStatus(videoId: string, status: string) {
   }
 
   loadVideos();
+  setSuccessMessage("Vídeo atualizado com sucesso.");
 }
 async function deleteVideo(video: Video) {
   const confirmDelete = confirm(
@@ -216,6 +221,7 @@ async function deleteVideo(video: Video) {
 useEffect(() => {
   loadClients();
 loadVideos();
+setSuccessMessage("Vídeo apagado com sucesso.");
 }, []);
 
   return (
@@ -253,7 +259,11 @@ loadVideos();
       Logout
     </button>
   </div>
-
+{successMessage && (
+  <div className="mt-6 rounded-2xl bg-sky-400 px-5 py-4 font-semibold text-slate-950">
+    {successMessage}
+  </div>
+)}
   <div className="mt-8 flex flex-wrap gap-3">
     <a
       href="/"

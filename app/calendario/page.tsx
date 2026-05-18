@@ -25,6 +25,7 @@ export default function CalendarioPage() {
 const [videoNotes, setVideoNotes] = useState<Record<string, string>>({});
 const [captionNotes, setCaptionNotes] = useState<Record<string, string>>({});
   const [videos, setVideos] = useState<Video[]>([]);
+  const [successMessage, setSuccessMessage] = useState("");
   const [selectedDate, setSelectedDate] = useState("");
   const [userRole, setUserRole] = useState("");
   const [userEmail, setUserEmail] = useState("");
@@ -108,6 +109,7 @@ async function saveNotes(videoId: string) {
     .eq("id", videoId);
 
   loadVideos();
+  setSuccessMessage("Atualizado com sucesso.");
 }
   useEffect(() => {
     loadVideos();
@@ -155,7 +157,11 @@ async function saveNotes(videoId: string) {
             Logout
           </button>
         </div>
-
+{successMessage && (
+  <div className="mt-6 rounded-2xl bg-sky-400 px-5 py-4 font-semibold text-slate-950">
+    {successMessage}
+  </div>
+)}
         <div className="mt-8 flex flex-wrap gap-3">
           {userRole === "admin" && (
             <>
