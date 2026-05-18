@@ -370,6 +370,129 @@ loadBudgets();
             </button>
           </div>
         </section>
+        <section className="mt-8 rounded-3xl bg-white p-6 text-slate-950 shadow-xl">
+  <h2 className="text-2xl font-bold">
+    Orçamentos guardados
+  </h2>
+
+  {selectedBudget && (
+  <section className="mt-8 rounded-3xl bg-white p-6 text-slate-950 shadow-xl print:shadow-none">
+    <div className="flex items-start justify-between gap-6">
+      <div>
+        <p className="text-sm font-bold uppercase tracking-[0.25em] text-sky-500">
+          Orçamento
+        </p>
+
+        <h2 className="mt-2 text-3xl font-black">
+          {selectedBudget.clients?.[0]?.name || "Sem cliente"}
+        </h2>
+
+        <p className="mt-2 text-slate-600">
+          Data: {selectedBudget.budget_date || "Sem data"}
+        </p>
+      </div>
+
+      <button
+        onClick={() => window.print()}
+        className="rounded-2xl bg-sky-400 px-5 py-3 font-bold text-slate-950 transition hover:bg-sky-300 print:hidden"
+      >
+        Download PDF
+      </button>
+    </div>
+
+    <div className="mt-8 overflow-hidden rounded-2xl border border-slate-200">
+      <table className="w-full text-left">
+        <thead className="bg-slate-100">
+          <tr>
+            <th className="p-4">Serviço</th>
+            <th className="p-4">Qtd.</th>
+            <th className="p-4">Preço</th>
+            <th className="p-4">Subtotal</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {selectedBudgetItems.map((item) => (
+            <tr key={item.id} className="border-t border-slate-200">
+              <td className="p-4">
+                <p className="font-semibold">
+                  {item.services?.[0]?.name || "Serviço"}
+                </p>
+
+                <p className="text-sm text-slate-500">
+                  {item.services?.[0]?.ref} ·{" "}
+                  {item.services?.[0]?.detail || "Sem detalhe"}
+                </p>
+              </td>
+
+              <td className="p-4">{item.quantity}</td>
+              <td className="p-4">{item.unit_price}€</td>
+              <td className="p-4 font-bold">{item.subtotal}€</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <div className="mt-8 flex justify-end">
+      <div className="rounded-2xl bg-sky-50 p-5 text-right">
+        <p className="text-sm font-semibold text-sky-600">
+          Total
+        </p>
+
+        <p className="mt-1 text-4xl font-black">
+          {selectedBudget.total}€
+        </p>
+      </div>
+    </div>
+  </section>
+)}
+
+  <div className="mt-6 grid gap-4">
+    {budgets.map((budget) => (
+      <div
+        key={budget.id}
+        className="rounded-2xl border border-slate-200 p-5"
+      >
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div>
+            <p className="text-sm font-semibold text-sky-600">
+              {budget.status}
+            </p>
+
+            <h3 className="mt-1 text-xl font-bold">
+              {budget.clients?.[0]?.name || "Sem cliente"}
+            </h3>
+
+            <p className="mt-1 text-slate-600">
+              Data: {budget.budget_date || "Sem data"}
+            </p>
+
+            <p className="mt-2 text-2xl font-black">
+              {budget.total}€
+            </p>
+          </div>
+
+          <div className="flex gap-3">
+            <button
+              onClick={() => openBudget(budget)}
+              className="rounded-2xl border border-slate-200 px-5 py-3 font-semibold transition hover:bg-slate-100"
+            >
+              Ver orçamento
+            </button>
+
+            <button
+              onClick={() => window.print()}
+              className="rounded-2xl bg-sky-400 px-5 py-3 font-bold text-slate-950 transition hover:bg-sky-300"
+            >
+              Download PDF
+            </button>
+          </div>
+        </div>
+      </div>
+    ))}
+  </div>
+</section>
       </div>
     </main>
   );
