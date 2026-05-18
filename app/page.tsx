@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
 type Client = {
+  videos_this_month?: number;
   id: string;
   name: string;
   email: string | null;
@@ -84,7 +85,7 @@ async function loadPlans() {
 }
 
   async function loadClients() {
-  const { data } = await supabase
+  const { data: clientsData } = await supabase
     .from("clients")
     .select(`
       *,
@@ -97,7 +98,28 @@ async function loadPlans() {
     `)
     .order("created_at", { ascending: false });
 
-  if (data) setClients(data);
+  if (!clientsData) return;
+
+  const startOfMonth = new Date();
+  startOfMonth.setDate(1);
+  startOfMonth.setHours(0, 0, 0, 0);
+
+  const { data: videosData } = await supabase
+    .from("videos")
+    .select("client_id, created_at")
+    .gte("created_at", startOfMonth.toISOString());
+
+  const clientsWithCounts = clientsData.map((client) => {
+    const videosThisMonth =
+      videosData?.filter((video) => video.client_id === client.id).length || 0;
+
+    return {
+      ...client,
+      videos_this_month: videosThisMonth,
+    };
+  });
+
+  setClients(clientsWithCounts);
 }
 
   async function loadVideos(role?: string, clientId?: string | null) {
@@ -638,6 +660,38 @@ return (
     </p>
   )}
 </div>
+{client.plans && (
+  <div className="mt-4">
+    <div className="flex items-center justify-between text-sm">
+      <span className="font-semibold text-slate-700">
+        Vídeos este mês
+      </span>
+
+      <span className="font-bold text-slate-950">
+        {client.videos_this_month || 0} / {client.plans.videos_per_month}
+      </span>
+    </div>
+
+    <div className="mt-2 h-3 overflow-hidden rounded-full bg-slate-200">
+      <div
+        className="h-full rounded-full bg-sky-400"
+        style={{
+          width: `${Math.min(
+            ((client.videos_this_month || 0) / client.plans.videos_per_month) *
+              100,
+            100
+          )}%`,
+        }}
+      />
+    </div>
+
+    {(client.videos_this_month || 0) > client.plans.videos_per_month && (
+      <p className="mt-2 text-sm font-semibold text-red-600">
+        Cliente ultrapassou o plano contratado.
+      </p>
+    )}
+  </div>
+)}
         <button
           onClick={() => {
             setEditingClientId(client.id);
