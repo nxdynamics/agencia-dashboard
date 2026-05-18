@@ -623,7 +623,21 @@ return (
         <p className="mt-2 text-slate-600">
           {client.email || "Sem email"}
         </p>
+<div className="mt-4 rounded-2xl bg-sky-50 p-4">
+  <p className="text-sm font-semibold text-sky-600">
+    Plano
+  </p>
 
+  <p className="mt-1 font-bold text-slate-950">
+    {client.plans?.name || "Sem plano"}
+  </p>
+
+  {client.plans && (
+    <p className="mt-1 text-sm text-slate-600">
+      {client.plans.monthly_price}€/mês · {client.plans.videos_per_week} vídeos/semana · {client.plans.videos_per_month} vídeos/mês
+    </p>
+  )}
+</div>
         <button
           onClick={() => {
             setEditingClientId(client.id);
