@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
 type Video = {
+  video_note: string | null;
+caption_note: string | null;
     status: string;
     scheduled_date: string | null;
   id: string;
@@ -413,6 +415,29 @@ loadVideos();
                 <p className="mt-2 whitespace-pre-wrap rounded-xl bg-gray-50 p-4 text-gray-700">
                   {video.caption || "Sem legenda."}
                 </p>
+                {userRole === "admin" && (
+  <div className="mt-4 grid gap-4 md:grid-cols-2">
+    <div className="rounded-xl bg-sky-50 p-4">
+      <h3 className="font-semibold text-slate-950">
+        Nota do vídeo
+      </h3>
+
+      <p className="mt-2 whitespace-pre-wrap text-slate-700">
+        {video.video_note || "Sem nota do vídeo."}
+      </p>
+    </div>
+
+    <div className="rounded-xl bg-sky-50 p-4">
+      <h3 className="font-semibold text-slate-950">
+        Nota da legenda
+      </h3>
+
+      <p className="mt-2 whitespace-pre-wrap text-slate-700">
+        {video.caption_note || "Sem nota da legenda."}
+      </p>
+    </div>
+  </div>
+)}
               </div>
 
               <div className="mt-6 grid gap-4 md:grid-cols-2">
