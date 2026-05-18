@@ -48,6 +48,8 @@ type BudgetItem = {
 
 export default function OrcamentosPage() {
   const router = useRouter();
+  const [travelKm, setTravelKm] = useState("");
+const [travelTolls, setTravelTolls] = useState("");
   const [budgets, setBudgets] = useState<Budget[]>([]);
 const [selectedBudget, setSelectedBudget] = useState<Budget | null>(null);
 const [selectedBudgetItems, setSelectedBudgetItems] = useState<BudgetItemFull[]>([]);
@@ -109,6 +111,8 @@ const [selectedBudgetItems, setSelectedBudgetItems] = useState<BudgetItemFull[]>
 
     return total + service.price * item.quantity;
   }, 0);
+  const travelCost = Number(travelKm || 0) * 0.25 + Number(travelTolls || 0);
+const total = subtotal + travelCost;
 
   async function saveBudget() {
     if (!selectedClient || items.length === 0) {
@@ -119,11 +123,16 @@ const [selectedBudgetItems, setSelectedBudgetItems] = useState<BudgetItemFull[]>
     const { data: budgetData, error: budgetError } = await supabase
       .from("budgets")
       .insert({
-        client_id: selectedClient,
-        subtotal_services: subtotal,
-        total: subtotal,
-        status: "rascunho",
-      })
+  client_id: selectedClient,
+  client_name:
+    clients.find((client) => client.id === selectedClient)?.name || null,
+  subtotal_services: subtotal,
+  travel_cost: travelCost,
+  travel_km: Number(travelKm || 0),
+  travel_tolls: Number(travelTolls || 0),
+  total: total,
+  status: "rascunho",
+})
       .select()
       .single();
 
@@ -138,14 +147,17 @@ const [selectedBudgetItems, setSelectedBudgetItems] = useState<BudgetItemFull[]>
   if (!service || service.price === null) return [];
 
   return [
-    {
-      budget_id: budgetData.id,
-      service_id: service.id,
-      quantity: item.quantity,
-      unit_price: service.price,
-      subtotal: service.price * item.quantity,
-    },
-  ];
+  {
+    budget_id: budgetData.id,
+    service_id: service.id,
+    service_ref: service.ref,
+    service_name: service.name,
+    service_detail: service.detail,
+    quantity: item.quantity,
+    unit_price: service.price,
+    subtotal: service.price * item.quantity,
+  },
+];
 });
 
     const { error: itemsError } = await supabase
@@ -159,6 +171,8 @@ const [selectedBudgetItems, setSelectedBudgetItems] = useState<BudgetItemFull[]>
 
     setSelectedClient("");
     setItems([]);
+    setTravelKm("");
+setTravelTolls("");
     setSuccessMessage("Orçamento guardado com sucesso.");
     loadBudgets();
   }
@@ -275,6 +289,24 @@ loadBudgets();
               ))}
             </select>
 
+<div className="grid gap-4 md:grid-cols-2">
+  <input
+    type="number"
+    className="rounded-2xl border border-slate-200 bg-slate-50 p-4"
+    placeholder="KM deslocação"
+    value={travelKm}
+    onChange={(e) => setTravelKm(e.target.value)}
+  />
+
+  <input
+    type="number"
+    className="rounded-2xl border border-slate-200 bg-slate-50 p-4"
+    placeholder="Portagens (€)"
+    value={travelTolls}
+    onChange={(e) => setTravelTolls(e.target.value)}
+  />
+</div>
+
             <div className="grid gap-4">
               {items.map((item, index) => {
                 const service = getService(item.serviceId);
@@ -358,7 +390,7 @@ loadBudgets();
               </p>
 
               <p className="mt-1 text-4xl font-black">
-                {subtotal}€
+                {total}€
               </p>
             </div>
 
