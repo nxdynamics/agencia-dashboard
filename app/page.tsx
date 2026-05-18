@@ -8,6 +8,21 @@ type Client = {
   id: string;
   name: string;
   email: string | null;
+  plan_id: string | null;
+plans: {
+  name: string;
+  monthly_price: number;
+  videos_per_week: number;
+  videos_per_month: number;
+} | null;
+};
+
+type Plan = {
+  id: string;
+  name: string;
+  monthly_price: number;
+  videos_per_week: number;
+  videos_per_month: number;
 };
 
 type Video = {
@@ -29,6 +44,8 @@ caption_note: string | null;
 };
 
 export default function Home() {
+  const [plans, setPlans] = useState<Plan[]>([]);
+const [selectedPlan, setSelectedPlan] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [clientPassword, setClientPassword] = useState("");
   const [editingVideoId, setEditingVideoId] = useState<string | null>(null);
@@ -57,14 +74,31 @@ const [editingClientEmail, setEditingClientEmail] = useState("");
   const [caption, setCaption] = useState("");
   const [selectedClient, setSelectedClient] = useState("");
 
-  async function loadClients() {
-    const { data } = await supabase
-      .from("clients")
-      .select("*")
-      .order("created_at", { ascending: false });
+async function loadPlans() {
+  const { data } = await supabase
+    .from("plans")
+    .select("*")
+    .order("monthly_price", { ascending: true });
 
-    if (data) setClients(data);
-  }
+  if (data) setPlans(data);
+}
+
+  async function loadClients() {
+  const { data } = await supabase
+    .from("clients")
+    .select(`
+      *,
+      plans (
+        name,
+        monthly_price,
+        videos_per_week,
+        videos_per_month
+      )
+    `)
+    .order("created_at", { ascending: false });
+
+  if (data) setClients(data);
+}
 
   async function loadVideos(role?: string, clientId?: string | null) {
   let query = supabase
@@ -101,9 +135,10 @@ const [editingClientEmail, setEditingClientEmail] = useState("");
   const { data: clientData, error: clientError } = await supabase
     .from("clients")
     .insert({
-      name: clientName,
-      email: clientEmail,
-    })
+  name: clientName,
+  email: clientEmail,
+  plan_id: selectedPlan || null,
+})
     .select()
     .single();
 
@@ -139,6 +174,7 @@ const [editingClientEmail, setEditingClientEmail] = useState("");
   setClientName("");
   setClientEmail("");
   setClientPassword("");
+  setSelectedPlan("");
 
   loadClients();
   setSuccessMessage("Cliente criado com sucesso.");
@@ -266,6 +302,7 @@ async function deleteVideo(video: Video) {
     setProfileClientId(profile?.client_id || null);
 
     loadClients();
+    loadPlans();
 
     loadVideos(
       profile?.role || "client",
