@@ -52,7 +52,7 @@ export default function LoginPage() {
 
         <button
           type="submit"
-          className="mt-6 w-full rounded-lg bg-black px-5 py-3 text-white"
+          className="mt-6 w-full rounded-lg bg-black px-5 py-3 text-slate-700"
         >
           Entrar
         </button>
