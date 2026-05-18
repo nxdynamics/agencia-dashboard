@@ -178,7 +178,7 @@ const [editingClientEmail, setEditingClientEmail] = useState("");
     video_url: uploadedVideoUrl,
     caption: caption || null,
     scheduled_date: scheduledDate || null,
-    status: "ainda_nao_comecamos",
+    status: "nao_feito",
     video_approval: "pendente",
     caption_approval: "pendente",
   });
