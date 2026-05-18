@@ -477,7 +477,19 @@ return (
                 value={clientEmail}
                 onChange={(e) => setClientEmail(e.target.value)}
               />
+<select
+  className="rounded-2xl border border-slate-200 bg-slate-50 p-4 outline-none transition focus:border-slate-900"
+  value={selectedPlan}
+  onChange={(e) => setSelectedPlan(e.target.value)}
+>
+  <option value="">Seleciona um plano</option>
 
+  {plans.map((plan) => (
+    <option key={plan.id} value={plan.id}>
+      {plan.name} — {plan.monthly_price}€
+    </option>
+  ))}
+</select>
               <button
                 className="rounded-2xl bg-slate-950 px-5 py-4 font-semibold text-white transition hover:bg-slate-800"
                 type="submit"
