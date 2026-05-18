@@ -326,13 +326,21 @@ async function saveNotes(videoId: string) {
                   </div>
 
                   {video.video_url && (
-                    <video
-                      controls
-                      className="mt-5 w-full rounded-2xl border border-slate-200 bg-black"
-                    >
-                      <source src={video.video_url} />
-                    </video>
-                  )}
+  video.video_url.match(/\.(mp4|mov|webm)$/i) ? (
+    <video
+      controls
+      className="mt-5 w-full rounded-2xl border border-slate-200 bg-black"
+    >
+      <source src={video.video_url} />
+    </video>
+  ) : (
+    <img
+      src={video.video_url}
+      alt={video.title}
+      className="mt-5 w-full rounded-2xl border border-slate-200"
+    />
+  )
+)}
 
                   {video.caption && (
                     <div className="mt-5 rounded-2xl bg-white p-4">

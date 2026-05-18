@@ -472,7 +472,7 @@ return (
 
               <input
                 type="file"
-                accept="video/*"
+                accept="video/*,image/*"
                 className="rounded-2xl border border-slate-200 bg-slate-50 p-4"
                 onChange={(e) =>
                   setVideoFile(e.target.files?.[0] || null)
