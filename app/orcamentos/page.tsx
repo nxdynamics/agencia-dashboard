@@ -4,6 +4,28 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 
+type Budget = {
+  id: string;
+  budget_date: string | null;
+  total: number;
+  status: string;
+  clients: {
+  name: string;
+}[] | null;
+};
+
+type BudgetItemFull = {
+  id: string;
+  quantity: number;
+  unit_price: number;
+  subtotal: number;
+  services: {
+  ref: string;
+  name: string;
+  detail: string | null;
+}[] | null;
+};
+
 type Client = {
   id: string;
   name: string;
@@ -26,7 +48,9 @@ type BudgetItem = {
 
 export default function OrcamentosPage() {
   const router = useRouter();
-
+  const [budgets, setBudgets] = useState<Budget[]>([]);
+const [selectedBudget, setSelectedBudget] = useState<Budget | null>(null);
+const [selectedBudgetItems, setSelectedBudgetItems] = useState<BudgetItemFull[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
   const [services, setServices] = useState<Service[]>([]);
   const [selectedClient, setSelectedClient] = useState("");
@@ -136,10 +160,50 @@ export default function OrcamentosPage() {
     setSelectedClient("");
     setItems([]);
     setSuccessMessage("Orçamento guardado com sucesso.");
+    loadBudgets();
   }
+
+async function loadBudgets() {
+  const { data } = await supabase
+    .from("budgets")
+    .select(`
+      id,
+      budget_date,
+      total,
+      status,
+      clients (
+        name
+      )
+    `)
+    .order("created_at", { ascending: false });
+
+  if (data) setBudgets(data as Budget[]);
+}
+
+async function openBudget(budget: Budget) {
+  setSelectedBudget(budget);
+
+  const { data } = await supabase
+    .from("budget_items")
+    .select(`
+      id,
+      quantity,
+      unit_price,
+      subtotal,
+      services (
+        ref,
+        name,
+        detail
+      )
+    `)
+    .eq("budget_id", budget.id);
+
+  if (data) setSelectedBudgetItems(data as BudgetItemFull[]);
+}
 
   useEffect(() => {
     loadData();
+loadBudgets();
   }, []);
 
   return (
