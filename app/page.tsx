@@ -743,6 +743,15 @@ return (
             setEditingClientId(client.id);
             setEditingClientName(client.name);
             setEditingClientEmail(client.email || "");
+            setEditingCustomMonthlyPrice(
+  client.custom_monthly_price?.toString() || ""
+);
+setEditingCustomVideosPerWeek(
+  client.custom_videos_per_week?.toString() || ""
+);
+setEditingCustomVideosPerMonth(
+  client.custom_videos_per_month?.toString() || ""
+);
           }}
           className="mt-4 rounded-2xl border border-slate-200 px-4 py-2 font-semibold"
         >
