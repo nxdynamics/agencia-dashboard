@@ -278,7 +278,93 @@ async function deleteBudget(budgetId: string) {
   loadBudgets();
   setSuccessMessage("Orçamento eliminado com sucesso.");
 }
+const editingSubtotal = editingItems.reduce((total, item) => {
+  const service = getService(item.serviceId);
 
+  if (!service || service.price === null) return total;
+
+  return total + service.price * item.quantity;
+}, 0);
+
+const editingTravelCost =
+  Number(editingTravelKm || 0) * 0.25 +
+  Number(editingTravelTolls || 0);
+
+const editingTotal = editingSubtotal + editingTravelCost;
+
+async function updateBudget() {
+  if (!editingBudgetId) return;
+
+  const clientName =
+    clients.find((client) => client.id === editingBudgetClient)?.name || null;
+
+  const { error: budgetError } = await supabase
+    .from("budgets")
+    .update({
+      client_id: editingBudgetClient || null,
+      client_name: clientName,
+      project_name: editingProjectName || null,
+      project_location: editingProjectLocation || null,
+      travel_km: Number(editingTravelKm || 0),
+      travel_tolls: Number(editingTravelTolls || 0),
+      travel_cost: editingTravelCost,
+      subtotal_services: editingSubtotal,
+      total: editingTotal,
+      notes: editingNotes || null,
+    })
+    .eq("id", editingBudgetId);
+
+  if (budgetError) {
+    alert(budgetError.message);
+    return;
+  }
+
+  await supabase
+    .from("budget_items")
+    .delete()
+    .eq("budget_id", editingBudgetId);
+
+  const newItems = editingItems.flatMap((item) => {
+    const service = getService(item.serviceId);
+
+    if (!service || service.price === null) return [];
+
+    return [
+      {
+        budget_id: editingBudgetId,
+        service_id: service.id,
+        service_ref: service.ref,
+        service_name: service.name,
+        service_detail: service.detail,
+        quantity: item.quantity,
+        unit_price: service.price,
+        subtotal: service.price * item.quantity,
+      },
+    ];
+  });
+
+  if (newItems.length > 0) {
+    const { error: itemsError } = await supabase
+      .from("budget_items")
+      .insert(newItems);
+
+    if (itemsError) {
+      alert(itemsError.message);
+      return;
+    }
+  }
+
+  setSuccessMessage("Orçamento atualizado com sucesso.");
+  loadBudgets();
+
+  const updatedBudget = budgets.find(
+    (budget) => budget.id === editingBudgetId
+  );
+
+  if (updatedBudget) {
+    openBudget(updatedBudget);
+  }
+}
   useEffect(() => {
     loadData();
 loadBudgets();
