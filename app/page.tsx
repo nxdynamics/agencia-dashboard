@@ -378,13 +378,23 @@ async function updateClient() {
   const { error } = await supabase
     .from("clients")
     .update({
-      name: editingClientName,
-      email: editingClientEmail || null,
-    })
+  name: editingClientName,
+  email: editingClientEmail || null,
+  custom_monthly_price: editingCustomMonthlyPrice
+    ? Number(editingCustomMonthlyPrice)
+    : null,
+  custom_videos_per_week: editingCustomVideosPerWeek
+    ? Number(editingCustomVideosPerWeek)
+    : null,
+  custom_videos_per_month: editingCustomVideosPerMonth
+    ? Number(editingCustomVideosPerMonth)
+    : null,
+})
     .eq("id", editingClientId);
 
   if (error) {
     alert(error.message);
+    
     return;
   }
 
@@ -393,6 +403,26 @@ async function updateClient() {
   setEditingClientEmail("");
   loadClients();
   setSuccessMessage("Cliente atualizado com sucesso.");
+}
+async function deleteClient(clientId: string) {
+  const confirmDelete = confirm(
+    "Tens a certeza que queres eliminar este cliente?"
+  );
+
+  if (!confirmDelete) return;
+
+  const { error } = await supabase
+    .from("clients")
+    .delete()
+    .eq("id", clientId);
+
+  if (error) {
+    alert(error.message);
+    return;
+  }
+
+  loadClients();
+  setSuccessMessage("Cliente eliminado com sucesso.");
 }
 async function updateVideo() {
   if (!editingVideoId) return;
@@ -666,6 +696,30 @@ return (
           onChange={(e) => setEditingClientEmail(e.target.value)}
         />
 
+        <input
+  type="number"
+  className="w-full rounded-2xl border border-slate-200 bg-slate-50 p-3"
+  placeholder="Preço personalizado €/mês"
+  value={editingCustomMonthlyPrice}
+  onChange={(e) => setEditingCustomMonthlyPrice(e.target.value)}
+/>
+
+<input
+  type="number"
+  className="w-full rounded-2xl border border-slate-200 bg-slate-50 p-3"
+  placeholder="Vídeos por semana personalizados"
+  value={editingCustomVideosPerWeek}
+  onChange={(e) => setEditingCustomVideosPerWeek(e.target.value)}
+/>
+
+<input
+  type="number"
+  className="w-full rounded-2xl border border-slate-200 bg-slate-50 p-3"
+  placeholder="Vídeos por mês personalizados"
+  value={editingCustomVideosPerMonth}
+  onChange={(e) => setEditingCustomVideosPerMonth(e.target.value)}
+/>
+
         <div className="flex gap-2">
           <button
             onClick={updateClient}
@@ -757,6 +811,12 @@ setEditingCustomVideosPerMonth(
         >
           Editar cliente
         </button>
+        <button
+  onClick={() => deleteClient(client.id)}
+  className="mt-3 rounded-2xl bg-red-600 px-4 py-2 font-semibold text-white transition hover:bg-red-700"
+>
+  Eliminar cliente
+</button>
       </>
     )}
   </div>
