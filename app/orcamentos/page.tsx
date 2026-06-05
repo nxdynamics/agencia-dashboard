@@ -5,6 +5,14 @@ import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 
 type Budget = {
+  client_id: string | null;
+client_name: string | null;
+project_name: string | null;
+project_location: string | null;
+travel_km: number | null;
+travel_tolls: number | null;
+travel_cost: number | null;
+notes: string | null;
   id: string;
   budget_date: string | null;
   total: number;
@@ -49,6 +57,14 @@ type BudgetItem = {
 
 
 export default function OrcamentosPage() {
+  const [editingBudgetId, setEditingBudgetId] = useState<string | null>(null);
+const [editingBudgetClient, setEditingBudgetClient] = useState("");
+const [editingProjectName, setEditingProjectName] = useState("");
+const [editingProjectLocation, setEditingProjectLocation] = useState("");
+const [editingTravelKm, setEditingTravelKm] = useState("");
+const [editingTravelTolls, setEditingTravelTolls] = useState("");
+const [editingNotes, setEditingNotes] = useState("");
+const [editingItems, setEditingItems] = useState<BudgetItem[]>([]);
   const router = useRouter();
   const [travelKm, setTravelKm] = useState("");
 const [travelTolls, setTravelTolls] = useState("");
@@ -197,12 +213,22 @@ async function loadBudgets() {
 }
 
 async function openBudget(budget: Budget) {
+  async function openBudget(budget: Budget) {
   setSelectedBudget(budget);
+  setEditingBudgetId(budget.id);
+
+  setEditingBudgetClient(budget.client_id || "");
+  setEditingProjectName(budget.project_name || "");
+  setEditingProjectLocation(budget.project_location || "");
+  setEditingTravelKm(budget.travel_km?.toString() || "");
+  setEditingTravelTolls(budget.travel_tolls?.toString() || "");
+  setEditingNotes(budget.notes || "");
 
   const { data } = await supabase
     .from("budget_items")
     .select(`
       id,
+      service_id,
       quantity,
       unit_price,
       subtotal,
@@ -214,7 +240,17 @@ async function openBudget(budget: Budget) {
     `)
     .eq("budget_id", budget.id);
 
-  if (data) setSelectedBudgetItems(data as BudgetItemFull[]);
+  if (data) {
+    setSelectedBudgetItems(data as BudgetItemFull[]);
+
+    setEditingItems(
+      data.map((item: any) => ({
+        serviceId: item.service_id,
+        quantity: item.quantity,
+      }))
+    );
+  }
+}
 }
 
 async function deleteBudget(budgetId: string) {
