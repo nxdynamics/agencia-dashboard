@@ -202,10 +202,19 @@ async function loadPlans() {
   const { error: profileError } = await supabase
     .from("profiles")
     .insert({
-      id: authData.user.id,
-      role: "client",
-      client_id: clientData.id,
-    });
+  name: clientName,
+  email: clientEmail,
+  plan_id: selectedPlan || null,
+  custom_monthly_price: customMonthlyPrice
+    ? Number(customMonthlyPrice)
+    : null,
+  custom_videos_per_week: customVideosPerWeek
+    ? Number(customVideosPerWeek)
+    : null,
+  custom_videos_per_month: customVideosPerMonth
+    ? Number(customVideosPerMonth)
+    : null,
+})
 
   if (profileError) {
     alert(profileError.message);
