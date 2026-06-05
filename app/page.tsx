@@ -516,6 +516,14 @@ return (
           >
             Calendário
           </a>
+
+          <a
+  href="/orcamentos"
+  className="rounded-2xl border border-slate-200 px-5 py-3 text-sm font-bold text-slate-950 transition hover:bg-slate-100"
+>
+  Orçamentos
+</a>
+
           <a
   href="/conta"
   className="rounded-2xl border border-slate-200 px-5 py-3 text-sm font-bold text-slate-950 transition hover:bg-slate-100"
