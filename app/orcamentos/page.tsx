@@ -656,39 +656,96 @@ function removeEditingItem(index: number) {
       </button>
     </div>
 
-    <div className="mt-8 overflow-hidden rounded-2xl border border-slate-200">
-      <table className="w-full text-left">
-        <thead className="bg-slate-100">
-          <tr>
-            <th className="p-4">Serviço</th>
-            <th className="p-4">Qtd.</th>
-            <th className="p-4">Preço</th>
-            <th className="p-4">Subtotal</th>
-          </tr>
-        </thead>
+    <div className="mt-8 grid gap-4">
+  <h3 className="text-2xl font-bold">
+    Serviços
+  </h3>
 
-        <tbody>
-          {selectedBudgetItems.map((item) => (
-            <tr key={item.id} className="border-t border-slate-200">
-              <td className="p-4">
-                <p className="font-semibold">
-                  {item.services?.[0]?.name || "Serviço"}
-                </p>
+  {editingItems.map((item, index) => {
+    const service = getService(item.serviceId);
 
-                <p className="text-sm text-slate-500">
-                  {item.services?.[0]?.ref} ·{" "}
-                  {item.services?.[0]?.detail || "Sem detalhe"}
-                </p>
-              </td>
+    return (
+      <div
+        key={index}
+        className="grid gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4 md:grid-cols-[1fr_120px_120px]"
+      >
+        <select
+          className="rounded-2xl border border-slate-200 bg-white p-3"
+          value={item.serviceId}
+          onChange={(e) =>
+            updateEditingItem(index, "serviceId", e.target.value)
+          }
+        >
+          <option value="">Seleciona serviço</option>
 
-              <td className="p-4">{item.quantity}</td>
-              <td className="p-4">{item.unit_price}€</td>
-              <td className="p-4 font-bold">{item.subtotal}€</td>
-            </tr>
+          {services.map((service) => (
+            <option key={service.id} value={service.id}>
+              {service.ref} — {service.name} —{" "}
+              {service.price === null ? "Consultar" : `${service.price}€`}
+            </option>
           ))}
-        </tbody>
-      </table>
-    </div>
+        </select>
+
+        <input
+          type="number"
+          min="1"
+          className="rounded-2xl border border-slate-200 bg-white p-3"
+          value={item.quantity}
+          onChange={(e) =>
+            updateEditingItem(index, "quantity", e.target.value)
+          }
+        />
+
+        <button
+          onClick={() => removeEditingItem(index)}
+          className="rounded-2xl bg-red-600 px-4 py-3 font-semibold text-white"
+        >
+          Remover
+        </button>
+
+        {service && (
+          <div className="rounded-2xl bg-white p-4 text-sm text-slate-600 md:col-span-3">
+            <p>
+              <strong>Detalhe:</strong>{" "}
+              {service.detail || "Sem detalhe"}
+            </p>
+
+            <p>
+              <strong>Subtotal:</strong>{" "}
+              {service.price === null
+                ? "Consultar"
+                : `${service.price * item.quantity}€`}
+            </p>
+          </div>
+        )}
+      </div>
+    );
+  })}
+
+  <button
+    onClick={addEditingItem}
+    className="rounded-2xl border border-slate-200 px-5 py-4 font-bold transition hover:bg-slate-100"
+  >
+    Adicionar serviço
+  </button>
+
+  <div className="rounded-2xl bg-sky-50 p-5 text-right">
+    <p className="text-sm font-semibold text-sky-600">
+      Total atualizado
+    </p>
+
+    <p className="mt-1 text-4xl font-black">
+      {editingTotal}€
+    </p>
+  </div>
+
+  <button
+    onClick={updateBudget}
+    className="rounded-2xl bg-sky-400 px-5 py-4 font-bold text-slate-950 transition hover:bg-sky-300"
+  >
+    Guardar alterações
+  </button>
+</div>
 
     <div className="mt-8 flex justify-end">
       <div className="rounded-2xl bg-sky-50 p-5 text-right">
