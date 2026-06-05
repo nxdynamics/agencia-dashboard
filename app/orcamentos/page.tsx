@@ -46,6 +46,8 @@ type BudgetItem = {
   quantity: number;
 };
 
+
+
 export default function OrcamentosPage() {
   const router = useRouter();
   const [travelKm, setTravelKm] = useState("");
@@ -213,6 +215,32 @@ async function openBudget(budget: Budget) {
     .eq("budget_id", budget.id);
 
   if (data) setSelectedBudgetItems(data as BudgetItemFull[]);
+}
+
+async function deleteBudget(budgetId: string) {
+  const confirmDelete = confirm(
+    "Tens a certeza que queres eliminar este orçamento?"
+  );
+
+  if (!confirmDelete) return;
+
+  const { error } = await supabase
+    .from("budgets")
+    .delete()
+    .eq("id", budgetId);
+
+  if (error) {
+    alert(error.message);
+    return;
+  }
+
+  if (selectedBudget?.id === budgetId) {
+    setSelectedBudget(null);
+    setSelectedBudgetItems([]);
+  }
+
+  loadBudgets();
+  setSuccessMessage("Orçamento eliminado com sucesso.");
 }
 
   useEffect(() => {
@@ -512,6 +540,12 @@ loadBudgets();
             >
               Ver orçamento
             </button>
+            <button
+  onClick={() => deleteBudget(budget.id)}
+  className="rounded-2xl bg-red-600 px-5 py-3 font-bold text-white transition hover:bg-red-700"
+>
+  Eliminar
+</button>
 
             <button
               onClick={() => window.print()}
