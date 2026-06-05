@@ -5,6 +5,9 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
 type Client = {
+  custom_monthly_price: number | null;
+custom_videos_per_week: number | null;
+custom_videos_per_month: number | null;
   videos_this_month?: number;
   id: string;
   name: string;
@@ -45,6 +48,13 @@ caption_note: string | null;
 };
 
 export default function Home() {
+  const [customMonthlyPrice, setCustomMonthlyPrice] = useState("");
+const [customVideosPerWeek, setCustomVideosPerWeek] = useState("");
+const [customVideosPerMonth, setCustomVideosPerMonth] = useState("");
+
+const [editingCustomMonthlyPrice, setEditingCustomMonthlyPrice] = useState("");
+const [editingCustomVideosPerWeek, setEditingCustomVideosPerWeek] = useState("");
+const [editingCustomVideosPerMonth, setEditingCustomVideosPerMonth] = useState("");
   const [plans, setPlans] = useState<Plan[]>([]);
 const [selectedPlan, setSelectedPlan] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
@@ -160,6 +170,15 @@ async function loadPlans() {
   name: clientName,
   email: clientEmail,
   plan_id: selectedPlan || null,
+  custom_monthly_price: customMonthlyPrice
+    ? Number(customMonthlyPrice)
+    : null,
+  custom_videos_per_week: customVideosPerWeek
+    ? Number(customVideosPerWeek)
+    : null,
+  custom_videos_per_month: customVideosPerMonth
+    ? Number(customVideosPerMonth)
+    : null,
 })
     .select()
     .single();
@@ -197,6 +216,9 @@ async function loadPlans() {
   setClientEmail("");
   setClientPassword("");
   setSelectedPlan("");
+  setCustomMonthlyPrice("");
+setCustomVideosPerWeek("");
+setCustomVideosPerMonth("");
 
   loadClients();
   setSuccessMessage("Cliente criado com sucesso.");
@@ -473,6 +495,30 @@ return (
             <h2 className="text-2xl font-bold">
               Adicionar cliente
             </h2>
+
+<input
+  type="number"
+  className="rounded-2xl border border-slate-200 bg-slate-50 p-4 outline-none transition focus:border-slate-900"
+  placeholder="Preço personalizado €/mês"
+  value={customMonthlyPrice}
+  onChange={(e) => setCustomMonthlyPrice(e.target.value)}
+/>
+
+<input
+  type="number"
+  className="rounded-2xl border border-slate-200 bg-slate-50 p-4 outline-none transition focus:border-slate-900"
+  placeholder="Vídeos por semana personalizados"
+  value={customVideosPerWeek}
+  onChange={(e) => setCustomVideosPerWeek(e.target.value)}
+/>
+
+<input
+  type="number"
+  className="rounded-2xl border border-slate-200 bg-slate-50 p-4 outline-none transition focus:border-slate-900"
+  placeholder="Vídeos por mês personalizados"
+  value={customVideosPerMonth}
+  onChange={(e) => setCustomVideosPerMonth(e.target.value)}
+/>
 
             <p className="mt-1 text-sm text-slate-500">
               Cria um novo cliente para associar vídeos e aprovações.
