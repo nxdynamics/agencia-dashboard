@@ -370,6 +370,31 @@ async function updateBudget() {
 loadBudgets();
   }, []);
 
+function addEditingItem() {
+  setEditingItems([...editingItems, { serviceId: "", quantity: 1 }]);
+}
+
+function updateEditingItem(
+  index: number,
+  field: keyof BudgetItem,
+  value: string
+) {
+  const updatedItems = [...editingItems];
+
+  updatedItems[index] = {
+    ...updatedItems[index],
+    [field]: field === "quantity" ? Number(value) : value,
+  };
+
+  setEditingItems(updatedItems);
+}
+
+function removeEditingItem(index: number) {
+  setEditingItems(
+    editingItems.filter((_, itemIndex) => itemIndex !== index)
+  );
+}
+
   return (
     <main className="min-h-screen bg-slate-950 p-4 text-white md:p-8">
       <div className="mx-auto max-w-7xl">
@@ -565,9 +590,58 @@ loadBudgets();
           Orçamento
         </p>
 
-        <h2 className="mt-2 text-3xl font-black">
-          {selectedBudget.clients?.[0]?.name || "Sem cliente"}
-        </h2>
+        <div className="grid gap-4 md:grid-cols-2">
+  <select
+    className="rounded-2xl border border-slate-200 bg-slate-50 p-4"
+    value={editingBudgetClient}
+    onChange={(e) => setEditingBudgetClient(e.target.value)}
+  >
+    <option value="">Seleciona cliente</option>
+
+    {clients.map((client) => (
+      <option key={client.id} value={client.id}>
+        {client.name}
+      </option>
+    ))}
+  </select>
+
+  <input
+    className="rounded-2xl border border-slate-200 bg-slate-50 p-4"
+    placeholder="Nome do projeto"
+    value={editingProjectName}
+    onChange={(e) => setEditingProjectName(e.target.value)}
+  />
+
+  <input
+    className="rounded-2xl border border-slate-200 bg-slate-50 p-4"
+    placeholder="Local do projeto"
+    value={editingProjectLocation}
+    onChange={(e) => setEditingProjectLocation(e.target.value)}
+  />
+
+  <input
+    type="number"
+    className="rounded-2xl border border-slate-200 bg-slate-50 p-4"
+    placeholder="KM"
+    value={editingTravelKm}
+    onChange={(e) => setEditingTravelKm(e.target.value)}
+  />
+
+  <input
+    type="number"
+    className="rounded-2xl border border-slate-200 bg-slate-50 p-4"
+    placeholder="Portagens (€)"
+    value={editingTravelTolls}
+    onChange={(e) => setEditingTravelTolls(e.target.value)}
+  />
+
+  <textarea
+    className="rounded-2xl border border-slate-200 bg-slate-50 p-4 md:col-span-2"
+    placeholder="Notas"
+    value={editingNotes}
+    onChange={(e) => setEditingNotes(e.target.value)}
+  />
+</div>
 
         <p className="mt-2 text-slate-600">
           Data: {selectedBudget.budget_date || "Sem data"}
